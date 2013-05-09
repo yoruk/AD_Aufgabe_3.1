@@ -98,24 +98,4 @@ public class ACOImpl implements ACO {
 
         return ants;
     }
-
-    public void run(String path, int citys, int rounds, int countAnt, int startPositionID) {
-        List<Connection> connections = Parser.initConnections(Parser.input(path));
-        List<Node> nodes = Parser.initNodes(connections);
-        List<Ant> ants = createAnts(countAnt, nodes.get(startPositionID - 1));
-
-        System.out.println(ants.toString());
-        //System.out.println(connection.toString());
-        //System.out.println(node.toString());
-
-        int i = 0;
-        while (rounds < i) {
-        	//TODO
-        	
-            // tmpConnection = findPath(altConnection);
-            // ant = move(connection);
-            // Altconnection = ...(tmpConnection);
-            i++;
-        }
-    }
 }

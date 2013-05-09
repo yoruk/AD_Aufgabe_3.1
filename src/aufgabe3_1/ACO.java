@@ -12,5 +12,4 @@ public interface ACO {
 	public Connection update(Connection connection);
 	public List<Connection> updateAll(List<Connection> list);
 	public List<Ant> createAnts(int antCount, Node startPosition);
-	public void run(String path, int citys, int rounds, int countAnt, int startPositionID);
 }
