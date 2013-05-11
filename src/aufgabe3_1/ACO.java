@@ -3,13 +3,23 @@ package aufgabe3_1;
 import java.util.List;
 
 public interface ACO {
-	public int way(List<Connection> list);
-	public List<Connection> goHome(Ant ant);
-	public List<Connection> clear(Ant ant);
-	public boolean checkAnt(Ant ant, int Citys);
-	public Connection findPath(Node node);
-	public Ant move(Connection connection);
-	public Connection update(Connection connection);
-	public List<Connection> updateAll(List<Connection> list);
-	public List<Ant> createAnts(int antCount, Node startPosition);
+	public int length(List<Integer> list, List<Connection> connectionList);
+
+    public Ant goHome(Ant ant);
+
+    public Ant clear(Ant ant);
+
+    public boolean tourFinished(Ant ant, int cities);
+
+    public double[] findPath(Ant ant, Node node, int cities, double alpha, double beta);
+
+    public Node randomPathChoice(List<Node> nodes, double[] array);
+
+    public Ant move(Ant ant, Node node);
+
+    public Connection updatePheromones(Connection connection, double alpha);
+
+    public List<Connection> evaporate(List<Connection> list, double rho);
+
+    public List<Ant> createAnts(int antCount, Node startPosition);
 }

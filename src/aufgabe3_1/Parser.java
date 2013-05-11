@@ -3,13 +3,21 @@ package aufgabe3_1;
 import java.io.*;
 import java.util.*;
 
-//Tour(int ID, int length, int omon, int IDcity1, int IDcity2)
-//Node(int ID, ArrayList<Tour> trail)
-
 public class Parser {
-    final public static int omon = 0;
 
-    public static int[] input(String filePath) {
+    // Startwert der Pheromone pro Connection
+    final public static int pheromon = 0;
+
+    /**
+     * Liest eine (symmetrische) TSP Datei ein und uebertraegt die linke
+     * untere Dreiecksmatrix in ein int Array.
+     * Erfordert Nullen als Trennzeichen.
+     * 
+     * @param filePath  String des Dateinamens / Dateipfades
+     * @return int      Array mit den Laengen der TSP Datei
+     */
+    public static int[] parseTestFile(String filePath) {
+
         int[] resultArray = null;
         String line; // Zu verarbeitende Zeile
         String lineSplit[]; // Werte ohne Trennzeichen
@@ -18,15 +26,20 @@ public class Parser {
         try {
             FileReader fr = new FileReader(filePath);
             BufferedReader br = new BufferedReader(fr);
-            
-            while ((line = br.readLine()) != null) {
-            	if((line.charAt(0) == '0')) {
-            		while(!(line.equals("EOF"))) {
 
-                        // Trennzeichen " " entfernen
+            while ((line = br.readLine()) != null) {
+
+                if((line.trim().charAt(0) == '0')) {
+                    while(!(line.equals("EOF"))) {
+
+                        // Unnoetige Whitespaces und Tabs am Anfang und Ende entfernen
+                        line = line.trim();
+
+                        // line bei jedem Trennzeichen " " aufsplitten und die
+                        // String Fragmente einzeln im lineSplit Array speichern
                         lineSplit = line.split(" ");
 
-                        // Werte ohne Trennzeichen in Liste abspeichern
+                        // Nur Werte ohne Trennzeichen in Array abspeichern
                         for(String element : lineSplit) {
                             if(!element.isEmpty()) {
                                 list.add(element);
@@ -46,75 +59,84 @@ public class Parser {
             for(int i = 0; i < resultArray.length; i++) {
                 resultArray[i] = Integer.parseInt(list.get(i));
             } // for
-            
-            br.close();
-            
-        } catch(Exception e) {
+
+            br.close(); // BufferedReader Stream schliessen
+
+        } catch (Exception e) {
             System.err.println(e);
+            System.err.println("TSP Datei konnte nicht eingelesen werden!");
             System.exit(0);
-        }
-        
+        } // catch
+
         return resultArray;
     }
 
     /**
      * Erzeugt eine ArrayList von Connections
      * 
-     * @param arr
-     *            Int Array mit denn Längen zwischen denn nodes
-     * @return Eine ArrayList von Connections
+     * @param array Array mit den Entfernungen zwischen den Nodes
+     * @return      Eine ArrayList von Connections
      */
-    public static List<Connection> initConnections(int[] arr) {
-        List<Connection> tour = new ArrayList<Connection>();
+    public static List<Connection> initConnections(int[] array) {
 
-        int IDcity1 = 1;
-        int IDcity2 = 1;
-        int ID = 1;
+        List<Connection> connectionList = new ArrayList<Connection>();
+        int cityID1 = 1;
+        int cityID2 = 1;
+        int connectionID = 1;
 
-        for(int i = 0; i < arr.length; i++) {
-            if(arr[i] == 0) {
-                IDcity1++;
-                IDcity2 = 1;
+        for (int i = 0; i < array.length; i++) {
+
+            if (array[i] == 0) {
+                cityID1++;
+                cityID2 = 1;
             } else {
-                if(IDcity1 == IDcity2) {
-                    IDcity2++;
-                }
-                
-                tour.add(new Connection(ID, arr[i], omon, IDcity1, IDcity2));
-                IDcity2++;
-                ID++;
-            }
-        }
-        
-        return tour;
+                if (cityID1 == cityID2) {
+                    cityID2++;
+                } // if
+
+                List<Integer> cities = new ArrayList<Integer>();
+                cities.add(cityID1);
+                cities.add(cityID2);
+
+                connectionList.add(new Connection(connectionID, array[i], pheromon, cities));
+                cityID2++;
+                connectionID++;
+            } // else
+        } // for
+
+        return connectionList;
     }
 
     /**
-     * Erzeugt eine ArrayListe aus Node
+     * Erzeugt eine ArrayListe aus Nodes
      * 
-     * @param connections
-     *            ArrayListe von Connections
-     * @return ArrayList von Nodes
+     * @param connections   ArrayListe von Connections
+     * @return              ArrayList von Nodes
      */
     public static List<Node> initNodes(List<Connection> connections) {
-        List<Node> node = new ArrayList<Node>();
-        Set<Integer> set = new HashSet<Integer>();
 
-        for(int i = 0; i < connections.size(); i++) {
-        	set.add(connections.get(i).IDcity1);
-            set.add(connections.get(i).IDcity2);
-        }
+        List<Node> nodeList = new ArrayList<Node>();
+        Set<Integer> connectionSet = new HashSet<Integer>();
 
-        for(int i = 0; i < set.size(); i++) {
-            List<Connection> cityTour = new ArrayList<Connection>();
-            for(int k = 0; k < connections.size(); k++) {
-                if(connections.get(k).IDcity1 == (i + 1) || connections.get(k).IDcity2 == (i + 1)) {
-                    cityTour.add(connections.get(k));
-                }
-            }
-            node.add(new Node(i + 1, cityTour));
-        }
+        for (int i = 0; i < connections.size(); i++) {
+            connectionSet.addAll(connections.get(i).cities);
+        } // for
 
-        return node;
+        for (int i = 0; i < connectionSet.size(); i++) {
+
+            List<Connection> connectionList = new ArrayList<Connection>();
+
+            for (int j = 0; j < connections.size(); j++) {
+
+                if (connections.get(j).cities.contains(i + 1)) {
+                    connectionList.add(connections.get(j));
+                } // if
+            } // for
+
+            nodeList.add(new Node(i + 1, connectionList));
+        } // for
+
+        return nodeList;
     }
+
 }

@@ -1,22 +1,24 @@
 package aufgabe3_1;
 
+import java.util.*;
+
 public class Connection {
-    final public int ID;
-    final public int length;
-    final public int IDcity1;
-    final public int IDcity2;
-    final public int omon;
-    
-    public Connection(int ID, int length, int omon, int IDcity1, int IDcity2) {
-        this.ID = ID;
+    final public int ID;				// ID der Connection
+    final public int length;			// Laenge der Connection
+    final public List<Integer> cities;	// Mit dieser Connection verbundene Cities
+    final public double pheromon;		// Pheromonkonzentration
+
+    public Connection(int connectionID, int length, double pheromon, List<Integer> cities) {
+        this.ID = connectionID;
         this.length = length;
-        this.omon = omon;
-        this.IDcity1 = IDcity1;
-        this.IDcity2 = IDcity2;
+        this.pheromon = pheromon;
+        this.cities = cities;
     }
 
     @Override
     public String toString() {
-        return "Connection [ID=" + ID + ", length=" + length + ", IDcity1=" + IDcity1 + ", IDcity2=" + IDcity2 + ", omon=" + omon + "]\n";
+        return "ConnectionID: " + ID + " | Length: " + length
+                + " | CityID's: " + cities.toString() + " | Pheromon: " + pheromon + "\n";
     }
+
 }
