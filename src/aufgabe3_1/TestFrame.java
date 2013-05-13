@@ -3,9 +3,9 @@ package aufgabe3_1;
 import java.util.*;
 
 public class TestFrame {
-    final public static String TESTDATA = "GR10_TEST.tsp";  // TSP Datei
-    final public static int BESTSOLUTION = 1876;            // Beste bislang bekannte Loesung
-    final public static int CITIES = 10;                    // Anzahl der Staedte
+    final public static String TESTDATA = "GR11_TEST.tsp";  // TSP Datei
+    final public static int BESTSOLUTION = 1899;            // Beste bislang bekannte Loesung
+    final public static int CITIES = 11;                    // Anzahl der Staedte
     final public static int ANTS = 10;                      // Anzahl der Ameisen
     final public static int CYCLES = 100000;                // Anzahl der Durchlaeufe
     final public static int STARTNODE = 1;                  // Startpunkt der Ameise
@@ -13,7 +13,7 @@ public class TestFrame {
     final public static double BETA = 5.0;                  // Einfluss der Weglaenge
     final public static double RHO = 0.5;                   // Evaporationskonstante
     final public static double P = 1.0;                     // Anfangswert fuer Pheromone
-    final public static boolean bruteForce = true;          // BruteForce oder ACO waehlen
+    final public static boolean BRUTEFORCE = true;          // BruteForce oder ACO waehlen
 
     public static void testBruteForce() {
         System.out.println(".::AUSWERTUNG FUER DIE BERECHNUNG MIT DEM BRUTEFORCE ALGORITHMUS::.\n");
@@ -227,17 +227,17 @@ public class TestFrame {
         StringBuilder durationOutput = new StringBuilder("\n\nBEST SOLUTION WURDE LEIDER NICHT ERREICHT :-("); // Output fuer die Dauer, wenn die beste Route gefunden wurde
 
 
-        if(bruteForce) {
+        if(BRUTEFORCE) {
 
             /* ***** BruteForce Algorithmus ausfuehren und Dauer berechnen **** */
             startTime = System.currentTimeMillis(); // Startzeit des Algorithmus setzen
             testBruteForce(); // BruteForce Methode starten
             long duration = (System.currentTimeMillis() - startTime); // Dauer
             long hours, minutes, seconds, milliseconds;
-            seconds = (int)(duration / 1000);
-            milliseconds = (int)(duration - (1000 * seconds));
-            minutes = (int)(duration / 1000 / 60);
-            hours = (int)(duration / 1000 / 60 / 60);
+            milliseconds = (duration % 1000);
+            seconds = ((duration / 1000) % 60);
+            minutes = (((duration / 1000) % 3600) / 60);
+            hours = ((duration / 1000) / 3600);
             System.out.print("DAUER: " + hours + " STUNDEN " + minutes + " MINUTEN " + seconds + " SEKUNDEN " + milliseconds + " MILLISEKUNDEN\n");
 
         } else {
@@ -365,10 +365,10 @@ public class TestFrame {
                 if (bestLength == BESTSOLUTION && !foundBestRoute) {
                     long duration = (System.currentTimeMillis() - startTime); // Dauer
                     long hours, minutes, seconds, milliseconds;
-                    seconds = (int) (duration / 1000);
-                    milliseconds = (int) (duration - (1000 * seconds));
-                    minutes = (int) (duration / 1000 / 60);
-                    hours = (int) (duration / 1000 / 60 / 60);
+                    milliseconds = (duration % 1000);
+                    seconds = ((duration / 1000) % 60);
+                    minutes = (((duration / 1000) % 3600) / 60);
+                    hours = ((duration / 1000) / 3600);
                     durationOutput = new StringBuilder();
                     durationOutput.append("\n\nBEST SOLUTION WURDE ERREICHT :-)\n");
                     durationOutput.append("\n\n.::AUSWERTUNG FUER DIE BERECHNUNG DER BEST SOLUTION::.\n\n");
