@@ -47,7 +47,7 @@ public class Parser {
                         } // for
 
                         // Naechste Zeile holen
-                        line = br.readLine();
+                        line = br.readLine().trim();
                     } // while
 
                 } // if

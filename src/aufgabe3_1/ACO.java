@@ -3,7 +3,7 @@ package aufgabe3_1;
 import java.util.List;
 
 public interface ACO {
-	public int length(List<Integer> list, List<Connection> connectionList);
+    public int length(List<Integer> list, List<Connection> connectionList);
 
     public Ant goHome(Ant ant);
 

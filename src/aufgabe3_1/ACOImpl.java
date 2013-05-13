@@ -8,20 +8,20 @@ public class ACOImpl implements ACO {
      * 
      * @param 	visitedNodes      	Liste der besuchten Staedte als Integer
      * @param 	connectionList		Liste aller Connections
-     * @return 	Laenge des Weges der diese Staedte miteinander verbindet
+     * @return 	                    Laenge des Weges der diese Staedte miteinander verbindet
      */
     public int length(List<Integer> visitedNodes, List<Connection> connectionList) {
-    	int length = 0;
+        int length = 0;
 
-    	// durchlaufe alle nodes
-        for(int i=1; i<visitedNodes.size(); i++) {
-        	
-        	// fuer jeden node alle connections durchlaufen
-            for(int j=0; j<connectionList.size(); j++) {
+        // Durchlaufe alle Nodes
+        for (int i = 1; i < visitedNodes.size(); i++) {
 
-            	// die connection suchen die zwei besuchte nodes miteinander verbindet
-                if((visitedNodes.get(i) == connectionList.get(j).cities.get(0) && visitedNodes.get(i-1) == connectionList.get(j).cities.get(1)) ||
-                   (visitedNodes.get(i) == connectionList.get(j).cities.get(1) && visitedNodes.get(i-1) == connectionList.get(j).cities.get(0))) {
+            // Durchlaufe fuer jeweiligen Node alle Connections 
+            for (int j = 0; j < connectionList.size(); j++) {
+
+                // Die Connection suchen, die zwei besuchte Nodes miteinander verbindet
+                if((visitedNodes.get(i) == connectionList.get(j).cities.get(0) && visitedNodes.get(i - 1) == connectionList.get(j).cities.get(1))
+                || (visitedNodes.get(i) == connectionList.get(j).cities.get(1) && visitedNodes.get(i - 1) == connectionList.get(j).cities.get(0))) {
 
                     length += connectionList.get(j).length;
                 } // if
@@ -30,7 +30,7 @@ public class ACOImpl implements ACO {
 
         return length;
     }
-    
+
     /**
      * Erzeugt eine ArrayList von Ants
      * 
@@ -45,9 +45,9 @@ public class ACOImpl implements ACO {
         visitedNodes.add(startPosition.ID);
 
         for(int i=0; i<antCount; i++) {
-           ants.add(new Ant(i+1, visitedNodes));
+            ants.add(new Ant(i+1, visitedNodes));
         }
-        
+
         return ants;
     }
 
@@ -59,10 +59,10 @@ public class ACOImpl implements ACO {
      * @return      Ameise an der neuen Position
      */
     public Ant move(Ant ant, Node node) {
-    	List<Integer> nodeList = ant.visitedNodes;
-    	nodeList.add(node.ID);
-    	
-    	return new Ant(ant.ID, nodeList);
+        List<Integer> nodeList = ant.visitedNodes;
+        nodeList.add(node.ID);
+
+        return new Ant(ant.ID, nodeList);
     }
 
     /**
@@ -72,8 +72,11 @@ public class ACOImpl implements ACO {
      * @return      Ameise mit Positionsdaten fuer die Heimkehr
      */
     public Ant goHome(Ant ant) {
-    	List<Integer> nodeList = ant.visitedNodes;
+        List<Integer> nodeList = ant.visitedNodes;
+
+        if(ant.visitedNodes.get(ant.visitedNodes.size() - 1) != ant.visitedNodes.get(0)) {
         nodeList.add(ant.visitedNodes.get(0));
+        }
 
         return new Ant(ant.ID, nodeList);
     }
@@ -87,7 +90,7 @@ public class ACOImpl implements ACO {
     public Ant clear(Ant ant) {
         List<Integer> nodeList = new ArrayList<Integer>();
         nodeList.add(ant.visitedNodes.get(0));
-        
+
         return new Ant(ant.ID, nodeList);
     }
 
@@ -99,11 +102,12 @@ public class ACOImpl implements ACO {
      * @return          Status der Tour
      */
     public boolean tourFinished(Ant ant, int numCities) {
-        if (ant.visitedNodes.size() >= numCities) {
-            return true;
+
+        // Wenn visitedNodes + Rueckweg groessergleich numCities + 1 ist
+        if (ant.visitedNodes.size() >= (numCities + 1)) {
+            return true; // true zurueckgeben
         }
-        
-        return false;
+        return false; // sonst false
     }
 
     /**
@@ -117,31 +121,31 @@ public class ACOImpl implements ACO {
         double newPheromon = 0;
 
         newPheromon = (oldConnection.pheromon + alpha);
-        
+
         if (newPheromon < 0 ) {
-            newPheromon = 0;
+            newPheromon = 0; // Negative Pheromon-Werte verhindern
         }
-        
+
         return new Connection(oldConnection.ID, oldConnection.length, newPheromon, oldConnection.cities);
     }
-    
+
     /**
-     * Verringert die Pheromonwerte aller Connections, erfordert update der Nodes
+     * Verringert die Pheromonwerte aller Connections (erfordert Update der Nodes)
      * 
-     * @param oldList   Liste aller Connections
+     * @param oldList   Liste aller aktueller Connections
      * @param rho       Evaporations-Koeffizient
-     * @return          Neue Liste aller Connections mit reduzierten Pheromonwerten
+     * @return          Neue Liste aller Connections mit reduziertem Pheromonwert
      */
     public List<Connection> evaporate(List<Connection> oldList, double rho) {
-    	List<Connection> newPheromones = new ArrayList<Connection>();
+        List<Connection> newPheromones = new ArrayList<Connection>();
 
         for(int i=0; i<oldList.size(); i++) {
-           newPheromones.add(updatePheromones(oldList.get(i), rho));
+            newPheromones.add(updatePheromones(oldList.get(i), rho));
         } // for
-        
+
         return newPheromones;
     }
-    
+
     /**
      * Ermittelt den Weg, welchen die Ameise gehen soll
      * 
@@ -150,72 +154,95 @@ public class ACOImpl implements ACO {
      * @return      Pfad, welchen die Ameise gehen soll
      */
     public double[] findPath(Ant ant, Node node, int numCities, double alpha, double beta) {
-
         double[] propabilities = new double[numCities];
         double nenner = 0.0;
 
         for (int i = 0; i < node.trails.size(); i++) {
 
-            Connection temp = node.trails.get(i);
-            //System.out.println(temp);
-            List<Integer> tempCities = temp.cities;
-            if (!(ant.visitedNodes.containsAll(tempCities))) {
+            Connection currentConnection = node.trails.get(i); // Aktuelle Connections
+            List<Integer> currentCities = currentConnection.cities; // Aktuelle Cities der Connections
+
+            // Wenn die Staedte in currentCities noch nicht besucht worden sind, Nenner berechnen
+            if (!(ant.visitedNodes.containsAll(currentCities))) {
 
                 nenner += Math.pow(node.trails.get(i).pheromon, alpha) * Math.pow(1.0 / node.trails.get(i).length, beta);
 
-                propabilities[i] = 1.0;
-            }
+                propabilities[i] = 1.0; // propabilities Index zur spaeteren Berechnung taggen
+            } // if
         } // for
-        
+
+        // Fuer getaggte Propabilities den Zaehler und das Endergebnis berechnen
         for (int j = 0; j < propabilities.length; j++) {
             if (propabilities[j] == 1.0) {
-                double zaehler = Math.pow(node.trails.get(j).pheromon, alpha)
-                               * Math.pow(1.0 / node.trails.get(j).length, beta);
+
+                double zaehler = Math.pow(node.trails.get(j).pheromon, alpha) * Math.pow(1.0 / node.trails.get(j).length, beta);
 
                 propabilities[j] = zaehler / nenner;
             } // if
         } // for
-        
-        // Schieben auf richtigen Index wert
-        for(int i = propabilities.length-1; i > 0; i--) {
-            if(i >= node.ID){
-                propabilities[i] = propabilities[i-1];
-                propabilities[i-1] = 0;
-            }
-        }
+
+        // Index der abgelegten Propabilities korrigieren, weil Trails < numCities
+        for (int i = propabilities.length - 1; i > 0; i--) {
+            if (i >= node.ID) {
+                propabilities[i] = propabilities[i - 1];
+                propabilities[i - 1] = 0;
+            } // if
+        } // for
 
         return propabilities;
     }
 
+    /**
+     * Waehlt aus den Wahrscheinlichkeiten zufaellig einen Wert aus
+     * 
+     * @param   nodes Liste mit den verfuegbaren Nodes
+     * @param   array Array mit den Wahrscheinlichkeiten (Propabilities)
+     * @return  Node, der auf Basis der Wahrscheinlichkeiten zufaellig gewaehlt wurde
+     */
     public Node randomPathChoice(List<Node> nodes, double[] array){
-        Random random = new Random();
-        double tempRandom = random.nextDouble();
+        double random = (new Random().nextDouble()); // Neuer Random double Wert
+        double[] copyArray = array.clone(); // Kopie vom Original Array erstellen
+        Arrays.sort(copyArray); // Kopie vom Original Array aufsteigend sortieren
+        double sumPropabilities = 0.0; // Aufsummierte Propabilities
+        double foundPropability = 0.0; // Propability, die kleinergleich Random ist
+        int resultIndex = -1; // Index von foundPropability im Original Array
 
-        double[] copyArray = array.clone();
-        
-        Arrays.sort(array);
-        
-        double index = -1;
-        double tempWin = 0.0;
-        for(int i = 0; i < array.length;i++) {
-            tempWin += array[i];
-            if(tempRandom <= tempWin){
-                index = array[i];
-                i = array.length;
+        /*
+         * Schritt [1]: Aufsteigend sortiertes Probabilities Array durchlaufen
+         * und die Wahrscheinlichkeiten in tempResult aufsummieren, bis der
+         * Propability-Wert gefunden wurde, bei dem die Summe der
+         * Wahrscheinlichkeiten noch kleinergleich random ist. Den gefundenen
+         * Propability-Wert in foundPropability speichern.
+         * 
+         * Schritt [2]: Im Originalen Array das Vorkommen von foundPropability
+         * finden und den Index in resultIndex speichern.
+         * 
+         * Schritt [3]: In der Node Liste den indexrichtigen Node, passend zum
+         * gefundenen Propability-Wert im uebergebenem Array, finden und
+         * ausgeben.
+         */
+
+        // Schritt [1]:
+        for (int i = 0; i < copyArray.length; i++) {
+            sumPropabilities += copyArray[i];
+            if (random <= sumPropabilities) {
+                foundPropability = copyArray[i]; // Propability-Wert speichern
+                i = copyArray.length; // for-Schleife abbrechen lassen
             }
         }
-        
-        for(int i = 0; i < copyArray.length; i++) {
-            if(copyArray[i] == index) {
-                index = i;
-                i = copyArray.length;
+
+        // Schritt [2]:
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == foundPropability) {
+                resultIndex = i; // Index von foundPropability im Original Array
+                i = array.length; // for-Schleife abbrechen lassen
             }
         }
-        System.out.println("\ntest: " + index);
-        
-        for(int i = 0; i < nodes.size(); i++) {
-            if(index != -1 && nodes.get(i).ID == index+1) {
-                return nodes.get(i);
+
+        // Schritt [3]:
+        for (int i = 0; i < nodes.size(); i++) {
+            if ((resultIndex != -1) && (nodes.get(i).ID == resultIndex + 1)) {
+                return nodes.get(i); // Gefundenen, indexrichtigen Node ausgeben 
             }
         }
         return null;
